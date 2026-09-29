@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crossword Clues Directory</title>
+    <!-- Tailwind CSS for sleek utility styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            light: '#4f46e5',
+                            dark: '#818cf8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons via development script -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
+
+    <div class="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <header class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-indigo-100 dark:bg-indigo-950/50 rounded-xl text-indigo-600 dark:text-indigo-400">
+                    <i data-lucide="layout-grid" class="w-8 h-8"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                        Crossword Clues
+                    </h1>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                        Interactive directory of all Across & Down clues
+                    </p>
+                </div>
+            </div>
+            
+            <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:bg-slate-50 dark:hover:bg-slate-900 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500" aria-label="Toggle dark mode">
+                <i id="theme-icon" data-lucide="moon" class="w-5 h-5 text-slate-600 dark:text-slate-300"></i>
+            </button>
+        </header>
+
+        <!-- Search Bar and Quick Stats -->
+        <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-2 relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
+                </div>
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="Search clues by number or words (e.g., 'ocean', '17')..." 
+                    class="block w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-950 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all shadow-sm"
+                    oninput="filterClues()"
+                >
+            </div>
+            <div class="flex gap-2">
+                <div class="flex-1 px-4 py-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm flex flex-col justify-center">
+                    <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Across Clues</span>
+                    <span class="text-xl font-extrabold text-indigo-600 dark:text-indigo-400">19</span>
+                </div>
+                <div class="flex-1 px-4 py-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm flex flex-col justify-center">
+                    <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Down Clues</span>
+                    <span class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">29</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clues List Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Across Section -->
+            <section class="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+                <div class="flex items-center gap-2 mb-6 pb-3 border-b border-slate-100 dark:border-slate-900">
+                    <i data-lucide="arrow-right" class="w-6 h-6 text-indigo-600 dark:text-indigo-400"></i>
+                    <h2 class="text-xl font-bold tracking-wide uppercase text-slate-900 dark:text-white">
+                        Across
+                    </h2>
+                </div>
+                <ul id="across-list" class="space-y-4">
+                    <!-- Clues are populated with javascript to allow easy matching & search indexing -->
+                </ul>
+            </section>
+
+            <!-- Down Section -->
+            <section class="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+                <div class="flex items-center gap-2 mb-6 pb-3 border-b border-slate-100 dark:border-slate-900">
+                    <i data-lucide="arrow-down" class="w-6 h-6 text-emerald-600 dark:text-emerald-400"></i>
+                    <h2 class="text-xl font-bold tracking-wide uppercase text-slate-900 dark:text-white">
+                        Down
+                    </h2>
+                </div>
+                <ul id="down-list" class="space-y-4">
+                    <!-- Clues populated with javascript -->
+                </ul>
+            </section>
+
+        </div>
+
+        <!-- No Results Banner -->
+        <div id="no-results" class="hidden text-center py-12 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm mt-8">
+            <i data-lucide="alert-circle" class="w-12 h-12 text-slate-400 mx-auto mb-3"></i>
+            <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-300">No clues match your search</h3>
+            <p class="text-slate-400 text-sm mt-1">Try searching for different keywords or clue numbers.</p>
+        </div>
+
+        <!-- Answer Toggle -->
+        <div class="mt-10 flex justify-center">
+            <label class="inline-flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm cursor-pointer select-none">
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Show answers</span>
+                <input id="answer-toggle" type="checkbox" class="sr-only" onchange="toggleAnswers()">
+                <span class="relative h-6 w-11 rounded-full bg-slate-300 dark:bg-slate-700 transition-colors duration-200" aria-hidden="true">
+                    <span id="answer-toggle-knob" class="absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200"></span>
+                </span>
+            </label>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-xs text-slate-400">
+            Rendered with clean typography & accessible layouts. Built for quick screen reference.
+        </footer>
+    </div>
+
+    <script>
+        let showAnswers = false;
+
+        // Clues data
+        const acrossClues = [
+            { num: 1, text: "Atlantic or Pacific, for example (5)", answer: "OCEAN" },
+            { num: 6, text: "\"___ is where the heart is\" (4)", answer: "HOME" },
+            { num: 11, text: "Pachyderm with a trunk (8)", answer: "ELEPHANT" },
+            { num: 12, text: "Put pen to paper (5)", answer: "WRITE" },
+            { num: 13, text: "Ave. crosser (2)", answer: "ST" },
+            { num: 14, text: "Sound heard in a canyon (4)", answer: "ECHO" },
+            { num: 15, text: "Citrus fruit or its color (6)", answer: "ORANGE" },
+            { num: 17, text: "Baseball and football squads (5)", answer: "TEAMS" },
+            { num: 18, text: "___ the loop (aware) (2)", answer: "IN" },
+            { num: 19, text: "Kitchen cooker on a stove (3)", answer: "POT" },
+            { num: 20, text: "Common picnic pest (3)", answer: "ANT" },
+            { num: 21, text: "12th grader, briefly (2)", answer: "SR" },
+            { num: 22, text: "Man's best friend (3)", answer: "DOG" },
+            { num: 23, text: "Gratuity left for a waiter (3)", answer: "TIP" },
+            { num: 24, text: "Stitch with thread (3)", answer: "SEW" },
+            { num: 25, text: "\"___ are a few of my favorite things\" (5)", answer: "THESE" },
+            { num: 26, text: "Prefix meaning \"two\" (2)", answer: "BI" },
+            { num: 28, text: "Group of students (5)", answer: "CLASS" },
+            { num: 29, text: "\"Right away!\" on an office memo (4)", answer: "ASAP" }
+        ];
+
+        const downClues = [
+            { num: 1, text: "Purple fruits dried to make prunes (5)", answer: "PLUMS" },
+            { num: 2, text: "\"The ___ side of the coin\" (5)", answer: "OTHER" },
+            { num: 3, text: "Like a skyscraper or a sequoia tree (4)", answer: "TALL" },
+            { num: 4, text: "The most common letter in English (1)", answer: "E" },
+            { num: 5, text: "Boy's counterpart (4)", answer: "GIRL" },
+            { num: 6, text: "Department dealing with employees (abbr.) (2)", answer: "HR" },
+            { num: 7, text: "British punks' shouts (3)", answer: "OIS" },
+            { num: 8, text: "What the \"@\" symbol stands for (2)", answer: "AT" },
+            { num: 9, text: "Roman numeral for 1,000 (1)", answer: "M" },
+            { num: 10, text: "A score of zero in tennis (4)", answer: "LOVE" },
+            { num: 11, text: "\"Wish You ___ Here\" (Pink Floyd) (4)", answer: "WERE" },
+            { num: 12, text: "Annoying little flying bug (4)", answer: "GNAT" },
+            { num: 14, text: "Prefix meaning \"equal\" (3)", answer: "ISO" },
+            { num: 16, text: "Compose a letter (5)", answer: "WRITE" },
+            { num: 17, text: "The ego; one's own identity (4)", answer: "SELF" },
+            { num: 18, text: "\"It ___ what it is\" (2)", answer: "IS" },
+            { num: 19, text: "Part number (abbr.) (2)", answer: "PN" },
+            { num: 20, text: "Stinging honey-maker (3)", answer: "BEE" },
+            { num: 21, text: "Junior's father, often (abbr.) (2)", answer: "SR" },
+            { num: 22, text: "Morning moisture on the grass (3)", answer: "DEW" },
+            { num: 23, text: "Long, sweeping epic tale (4)", answer: "SAGA" },
+            { num: 24, text: "Spit out forcefully (4)", answer: "SPEW" },
+            { num: 25, text: "Prefix for \"three\" (3)", answer: "TRI" },
+            { num: 26, text: "Musical encores (3)", answer: "BIS" },
+            { num: 27, text: "Compass point opposite North (1)", answer: "S" },
+            { num: 28, text: "Albums of the '90s (3)", answer: "CDS" },
+            { num: 29, text: "Slithering reptile (5)", answer: "SNAKE" }
+        ];
+
+        // Render functions
+        function renderClues() {
+            const acrossContainer = document.getElementById('across-list');
+            const downContainer = document.getElementById('down-list');
+
+            acrossContainer.innerHTML = acrossClues.map(clue => `
+                <li class="clue-item flex items-start gap-4 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors duration-150" data-num="${clue.num}" data-text="${`${clue.text} ${clue.answer}`.toLowerCase()}">
+                    <span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-extrabold text-sm border border-indigo-100 dark:border-indigo-900/40">
+                        ${clue.num}
+                    </span>
+                    <span class="flex-1 text-sm sm:text-base text-slate-700 dark:text-slate-200 mt-1 leading-relaxed">
+                        <span>${clue.text}</span>
+                        ${showAnswers ? `<span class="ml-2 inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 text-xs font-extrabold tracking-wide text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/40">${clue.answer}</span>` : ''}
+                    </span>
+                </li>
+            `).join('');
+
+            downContainer.innerHTML = downClues.map(clue => `
+                <li class="clue-item flex items-start gap-4 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors duration-150" data-num="${clue.num}" data-text="${`${clue.text} ${clue.answer}`.toLowerCase()}">
+                    <span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-extrabold text-sm border border-emerald-100 dark:border-emerald-900/40">
+                        ${clue.num}
+                    </span>
+                    <span class="flex-1 text-sm sm:text-base text-slate-700 dark:text-slate-200 mt-1 leading-relaxed">
+                        <span>${clue.text}</span>
+                        ${showAnswers ? `<span class="ml-2 inline-flex items-center rounded-md bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 text-xs font-extrabold tracking-wide text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/40">${clue.answer}</span>` : ''}
+                    </span>
+                </li>
+            `).join('');
+
+            // Initialize Icons
+            lucide.createIcons();
+        }
+
+        function toggleAnswers() {
+            const toggle = document.getElementById('answer-toggle');
+            const knob = document.getElementById('answer-toggle-knob');
+            showAnswers = toggle.checked;
+
+            knob.classList.toggle('translate-x-5', showAnswers);
+            knob.parentElement.classList.toggle('bg-indigo-600', showAnswers);
+            knob.parentElement.classList.toggle('dark:bg-indigo-500', showAnswers);
+            renderClues();
+            filterClues();
+
+            if (showAnswers) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Live Search Filter
+        function filterClues() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const clueItems = document.querySelectorAll('.clue-item');
+            let hasVisibleClues = false;
+
+            clueItems.forEach(item => {
+                const text = item.getAttribute('data-text');
+                const num = item.getAttribute('data-num');
+                
+                // Matches either the text content or the exact clue number
+                if (text.includes(query) || num === query) {
+                    item.classList.remove('hidden');
+                    hasVisibleClues = true;
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+
+            // Toggle "No Results" banner
+            const noResults = document.getElementById('no-results');
+            if (hasVisibleClues || query === '') {
+                noResults.classList.add('hidden');
+            } else {
+                noResults.classList.remove('hidden');
+            }
+
+            // Hide section titles or sections if they contain zero matches
+            toggleSectionVisibility('across-list');
+            toggleSectionVisibility('down-list');
+        }
+
+        function toggleSectionVisibility(listId) {
+            const list = document.getElementById(listId);
+            const parentSection = list.closest('section');
+            const hasVisibleItems = Array.from(list.children).some(item => !item.classList.contains('hidden'));
+            
+            if (hasVisibleItems) {
+                parentSection.classList.remove('hidden');
+            } else {
+                parentSection.classList.add('hidden');
+            }
+        }
+
+        // Dark Mode Logic
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon(isDark);
+        }
+
+        function updateThemeIcon(isDark) {
+            const icon = document.getElementById('theme-icon');
+            if (isDark) {
+                icon.setAttribute('data-lucide', 'sun');
+            } else {
+                icon.setAttribute('data-lucide', 'moon');
+            }
+            lucide.createIcons();
+        }
+
+        // Load Initial Theme & Clues
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.classList.add('dark');
+                updateThemeIcon(true);
+            } else {
+                document.documentElement.classList.remove('dark');
+                updateThemeIcon(false);
+            }
+
+            renderClues();
+        }
+    </script>
+</body>
+</html>
